@@ -2,7 +2,7 @@ from zipfile import ZipFile, ZIP_STORED
 import json
 from io import StringIO, BytesIO
 
-from functools import lru_cache
+from functools import cached_property
 import pandas as pd
 
 from .identifiers import Pid
@@ -85,7 +85,7 @@ class _ZipBinImages(BaseDictlike):
         return self.index
     def has_key(self, k):
         return k in self.index
-    
+
 class ZipBin(BaseBin):
     def __init__(self, zip_path):
         self.zip_path = zip_path
@@ -116,8 +116,7 @@ class ZipBin(BaseBin):
     @property
     def pid(self):
         return self._pid
-    @property
-    @lru_cache()
+    @cached_property
     def adc(self):
         arcname = self.lid + ADC_ARCNAME_SUFFIX
         fin = self._zip.open(arcname)
@@ -125,8 +124,7 @@ class ZipBin(BaseBin):
         adc.columns = [c for c in adc.columns]
         adc.index = pd.RangeIndex(1, len(adc) + 1)
         return adc
-    @property
-    @lru_cache()
+    @cached_property
     def headers(self):
         arcname = self.lid + HEADERS_ARCNAME_SUFFIX
         j = self._zip.read(arcname)

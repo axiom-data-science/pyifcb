@@ -8,7 +8,7 @@ from io import BytesIO
 import pandas as pd
 from pandas.errors import EmptyDataError
 
-from functools import lru_cache
+from functools import cached_property
 
 from .identifiers import Pid
 from .utils import BaseDictlike
@@ -108,7 +108,7 @@ def parse_adc_file(adc_file):
     except EmptyDataError:
         cols = s._cols
         return pd.DataFrame({c:[] for c in cols}, columns=cols)
-    
+
 class AdcFile(BaseDictlike):
     """
     Represents an IFCB ``.adc`` file.
@@ -148,8 +148,7 @@ class AdcFile(BaseDictlike):
         The bin's LID
         """
         return self.pid.lid
-    @property
-    @lru_cache()
+    @cached_property
     def csv(self):
         """
         The underlying CSV data as a ``pandas.DataFrame``
@@ -227,4 +226,3 @@ class AdcFragment(AdcFile):
         df = pd.read_csv(buf, header=None, index_col=False)
         df.index += self.start # index by 1-based ROI number
         return df
-

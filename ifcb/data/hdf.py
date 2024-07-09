@@ -5,7 +5,7 @@ Support for reading and writing IFCB data to HDF5.
 import datetime
 
 import numpy as np
-from functools import lru_cache
+from functools import cached_property
 
 from .h5utils import pd2hdf, hdf2pd, hdfopen, H5_REF_TYPE
 
@@ -171,7 +171,7 @@ def filesetbin2hdf(fs_bin, hdf_file, group=None, replace=True, archive=False):
         if archive:
             file2hdf(root, 'archive/adc', fs_bin.fileset.adc_path, compression='gzip')
             file2hdf(root, 'archive/hdr', fs_bin.fileset.hdr_path)
-        
+
 def fileset2hdf(fileset, hdf_file, group=None, replace=True, archive=False):
     """
     Write a fileset to HDF.
@@ -208,7 +208,7 @@ def hdf2fileset(hdf_path, fileset_path, group=None):
                 outroi.write(np.array(image).ravel())
             if schema1:
                 outroi.write("\0")
-        
+
 # bin interface to HDF
 
 class HdfRoi(BaseDictlike):
@@ -226,7 +226,7 @@ class HdfRoi(BaseDictlike):
         return len(self._group.attrs['index'])
     def __getitem__(self, roi_number):
         return np.array(self._group[self._group['images'][roi_number]])
-        
+
 class HdfBin(BaseBin):
     """
     Bin interface to HDF file/group.
@@ -271,30 +271,26 @@ class HdfBin(BaseBin):
         if self.isopen():
             self.close()
     # Dictlike
-    @property
-    @lru_cache()
+    @cached_property
     def adc(self):
         """
         adc(self)
         The bin's ADC data as a ``pandas.DataFrame``
         """
         return hdf2pd(self._group['adc'])
-    @property
-    @lru_cache()
+    @cached_property
     def schema(self):
         """
         The bin's schema
         """
         return SCHEMA[self._group['adc'].attrs['schema']]
-    @property
-    @lru_cache()
+    @cached_property
     def headers(self):
         """
         The bin's headers
         """
         return dict(self._group['hdr'].attrs)
-    @property
-    @lru_cache()
+    @cached_property
     def pid(self):
         """
         The bin's ``Pid``

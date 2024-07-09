@@ -2,7 +2,7 @@
 Bin API. Provides consistent access to IFCB raw data stored
 in various formats.
 """
-from functools import lru_cache
+from functools import cached_property
 
 from .adc import SCHEMA
 from .hdr import TEMPERATURE, HUMIDITY
@@ -34,8 +34,7 @@ class BaseBin(BaseDictlike):
         :returns str: the bin's LID.
         """
         return self.pid.bin_lid
-    @property
-    @lru_cache()
+    @cached_property
     def images_adc(self):
         """
         :returns pandas.DataFrame: the ADC data, minus targets that
@@ -74,7 +73,7 @@ class BaseBin(BaseDictlike):
     def __getitem__(self, target_number):
         return self.get_target(target_number)
     # metrics
-    @lru_cache()
+    @cached_property
     def _get_ml_analyzed(self):
         return compute_ml_analyzed(self)
     @property

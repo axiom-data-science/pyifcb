@@ -1,4 +1,4 @@
-from functools import lru_cache
+from functools import cached_property
 import math
 
 from skimage.transform import resize
@@ -19,7 +19,7 @@ class Mosaic(object):
         self.bg_color = bg_color
         self.scale = scale
         self.coordinates = coordinates
-    @lru_cache()
+    @cached_property
     def _shapes(self):
         hs, ws, ix = [], [], []
         with self.bin:

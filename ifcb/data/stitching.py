@@ -4,7 +4,7 @@ Note that this does not apply to data from commercial
 IFCB instruments.
 """
 
-from functools import lru_cache
+from functools import cached_property
 
 import numpy as np
 from scipy import ndimage as ndi
@@ -28,8 +28,7 @@ class Stitcher(BaseDictlike):
         :type the_bin: Bin
         """
         self.bin = the_bin
-    @property
-    @lru_cache()
+    @cached_property
     def coordinates(self):
         """
         Compute stitched image metrics.
@@ -67,7 +66,7 @@ class Stitcher(BaseDictlike):
         M['sx2'] = np.maximum(M['ax2'], M['bx2'])
         M['sy2'] = np.maximum(M['ay2'], M['by2'])
         return M
-    @lru_cache()
+    @cached_property
     def excluded_targets(self):
         """
         Returns the target numbers of the targets that should
@@ -95,7 +94,7 @@ class Stitcher(BaseDictlike):
         w = row['sx2'] - row['sx1']
         h = row['sy2'] - row['sy1']
         return (h, w)
-    @lru_cache(maxsize=2)
+    # @lru_cache(maxsize=2)
     def __getitem__(self, target_number):
         h, w = self.shape(target_number)
         row = self.coordinates.loc[target_number]
@@ -151,7 +150,7 @@ def infill_image(raw_stitch):
         fill_image = np.zeros(raw_stitch.shape, dtype=np.uint8)
     infill = np.ma.array(fill_image, mask=np.logical_not(raw_stitch.mask))
     return infill
-    
+
 class Infiller(BaseDictlike):
     """
     Wraps ``Bin`` to perform infilling of stitched images.
@@ -237,7 +236,7 @@ class InfilledImages(BaseDictlike):
         else:
             # this is not a stitched image
             return self.bin.images[target_number]
-    @lru_cache()
+    @cached_property
     def _shapes(self):
         schema = self.bin.schema
         h_attr = '_{}'.format(schema.ROI_HEIGHT + 1)

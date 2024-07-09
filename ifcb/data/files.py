@@ -3,7 +3,7 @@ Access to IFCB raw data files, including directory operations.
 """
 
 import os
-from functools import lru_cache
+from functools import cached_property
 
 import pandas as pd
 
@@ -44,8 +44,7 @@ class Fileset(object):
         The path of the ``.roi`` file.
         """
         return self.basepath + '.roi'
-    @property
-    @lru_cache()
+    @cached_property
     def pid(self):
         """
         A ``Pid`` representing the bin PID
@@ -120,8 +119,7 @@ class FilesetBin(BaseBin):
         self.adc_file = AdcFile(fileset.adc_path)
         self.roi_file = RoiFile(self.adc_file, fileset.roi_path)
     # oo interface to fileset
-    @property
-    @lru_cache()
+    @cached_property
     def hdr_attributes(self):
         """
         A ``dict`` representing the headers

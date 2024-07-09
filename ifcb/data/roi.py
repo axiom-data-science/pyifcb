@@ -3,7 +3,7 @@ Support for reading images from IFCB ``.roi`` files.
 """
 
 import os
-from functools import lru_cache
+from functools import cached_property
 
 import numpy as np
 
@@ -50,8 +50,7 @@ class RoiFile(BaseDictlike):
             self.adc = AdcFile(adc)
         self.path = roi_path
         self._inroi = None # start with the file closed
-    @property
-    @lru_cache()
+    @cached_property
     def csv(self):
         """adc data with non-ROI targets removed"""
         # remove 0x0 rois from adc data
